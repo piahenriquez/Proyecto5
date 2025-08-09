@@ -1,8 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Chart, registerables } from 'chart.js';
-import { Box, Button, Typography, CircularProgress, Card, CardContent, Alert, Avatar } from "@mui/material";
-import { WbSunny, Cloud, Thunderstorm } from "@mui/icons-material";
+import { 
+  Box, Button, Typography, CircularProgress, Card, CardContent, 
+  Alert, Avatar, TextField, Grid 
+} from "@mui/material";
+import { WbSunny, Cloud, Thunderstorm, DateRange } from "@mui/icons-material";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import esLocale from 'date-fns/locale/es';
+
 Chart.register(...registerables);
 
 const WeatherCharts = () => {
@@ -13,9 +21,21 @@ const WeatherCharts = () => {
   const [forecast, setForecast] = useState(null);
   const [cityInfo, setCityInfo] = useState(null);
   const [error, setError] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7); 
+    return date;
+  });
+
+  // Función para formatear fecha 
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
 
   useEffect(() => {
     let isMounted = true;
+    let chartInstance = null;
 
     const fetchCityInfo = async () => {
       try {
@@ -35,11 +55,7 @@ const WeatherCharts = () => {
           }
         );
         
-        if (!response.ok) {
-          throw new Error(response.status === 429 ? 
-            "Límite de solicitudes excedido. Intenta nuevamente más tarde." : 
-            "Error al obtener datos de la ciudad");
-        }
+        if (!response.ok) throw new Error("Error al obtener datos de la ciudad");
         
         const data = await response.json();
         if (isMounted) {
@@ -48,17 +64,16 @@ const WeatherCharts = () => {
         }
         return data.data;
       } catch (error) {
-        if (isMounted) {
-          setError(error.message);
-        }
+        if (isMounted) setError(error.message);
         return null;
       }
     };
 
     const fetchWeatherData = async (city) => {
       try {
+        setLoading(true);
         const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`
+          `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&start_date=${formatDate(startDate)}&end_date=${formatDate(endDate)}&timezone=auto`
         );
         
         if (!response.ok) throw new Error("Error al obtener datos del clima");
@@ -69,13 +84,9 @@ const WeatherCharts = () => {
           createChart(data);
         }
       } catch (error) {
-        if (isMounted) {
-          setError(error.message);
-        }
+        if (isMounted) setError(error.message);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -84,16 +95,25 @@ const WeatherCharts = () => {
       
       const ctx = chartRef.current.getContext('2d');
       
-      if (chartRef.current.chart) {
-        chartRef.current.chart.destroy();
+      
+      if (chartInstance) {
+        chartInstance.destroy();
       }
       
-      const labels = weatherData.hourly.time.slice(0, 24).map(time => 
-        new Date(time).toLocaleTimeString([], {hour: '2-digit'})
-      );
-      const temperatures = weatherData.hourly.temperature_2m.slice(0, 24);
+      // Filtrar datos por rango de fechas
+      const filteredData = weatherData.hourly.time
+        .map((time, index) => ({
+          time: new Date(time),
+          temperature: weatherData.hourly.temperature_2m[index]
+        }))
+        .filter(item => item.time >= startDate && item.time <= endDate);
       
-      chartRef.current.chart = new Chart(ctx, {
+      const labels = filteredData.map(item => 
+        item.time.toLocaleTimeString([], {hour: '2-digit'})
+      );
+      const temperatures = filteredData.map(item => item.temperature);
+      
+      chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
@@ -112,7 +132,7 @@ const WeatherCharts = () => {
             legend: { position: 'top' },
             title: {
               display: true,
-              text: 'Pronóstico de temperatura para las próximas 24 horas'
+              text: `Pronóstico de temperatura (${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()})`
             }
           }
         }
@@ -123,17 +143,19 @@ const WeatherCharts = () => {
       if (city) fetchWeatherData(city);
     });
 
-    const chartInstanceRef = chartRef.current;
-
     return () => {
       isMounted = false;
-      if (chartInstanceRef && chartInstanceRef.chart) {
-        chartInstanceRef.chart.destroy();
+      if (chartInstance) {
+        chartInstance.destroy();
       }
     };
-  }, [cityId]);
+  }, [cityId, startDate, endDate]); 
 
-  // Icono
+  const handleDateChange = (newStartDate, newEndDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+  };
+
   const getWeatherIcon = (weathercode) => {
     if (weathercode >= 80) return <Thunderstorm color="error" fontSize="large" />;
     if (weathercode >= 51 || weathercode <= 3) return <Cloud color="info" fontSize="large" />;
@@ -141,87 +163,139 @@ const WeatherCharts = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Button onClick={() => navigate(-1)} variant="contained" sx={{ mb: 3 }}>
-        Volver
-      </Button>
-      
-      {loading && !error && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress size={60} thickness={4} />
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={esLocale}>
+      <Box sx={{ p: 3 }}>
+        <Button onClick={() => navigate(-1)} variant="contained" sx={{ mb: 3 }}>
+          Volver
+        </Button>
+        
+        {/* Selectores de fecha */}
+        <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+          <DatePicker
+            label="Fecha inicial"
+            value={startDate}
+            onChange={(newValue) => handleDateChange(newValue, endDate)}
+            renderInput={(params) => <TextField {...params} />}
+            maxDate={endDate}
+          />
+          <DatePicker
+            label="Fecha final"
+            value={endDate}
+            onChange={(newValue) => handleDateChange(startDate, newValue)}
+            renderInput={(params) => <TextField {...params} />}
+            minDate={startDate}
+          />
+          <Button 
+            variant="outlined" 
+            startIcon={<DateRange />}
+            onClick={() => {
+              const today = new Date();
+              const nextWeek = new Date();
+              nextWeek.setDate(today.getDate() + 7);
+              handleDateChange(today, nextWeek);
+            }}
+          >
+            Restablecer
+          </Button>
         </Box>
-      )}
-      
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
 
-      {cityInfo && forecast && (
-        <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          {/* Clima actual a la izquierda */}
-          <Card sx={{ minWidth: 280, flex: '0 0 320px', mb: 3 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Avatar
-                  src={`https://flagcdn.com/w40/${cityInfo.countryCode?.toLowerCase()}.png`}
-                  alt={cityInfo.country}
-                  sx={{ mr: 2 }}
-                />
-                <Box>
-                  <Typography variant="h5">
-                    {cityInfo.name}, {cityInfo.country}
-                  </Typography>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {cityInfo.region}
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                {getWeatherIcon(forecast.current_weather.weathercode)}
-                <Typography variant="h2">
-                  {forecast.current_weather.temperature}°C
-                </Typography>
-              </Box>
-              <Typography>
-                <strong>Viento:</strong> {forecast.current_weather.windspeed} km/h
-              </Typography>
-              <Typography>
-                <strong>Hora:</strong> {new Date(forecast.current_weather.time).toLocaleTimeString()}
-              </Typography>
-            </CardContent>
-          </Card>
-          {/* Gráfico a la derecha */}
-          <Box sx={{ flex: 1, minWidth: 320 }}>
-            <Typography variant="h6" gutterBottom>
-              Pronóstico de 24 horas
-            </Typography>
-            <Box sx={{ mb: 4 }}>
-              <canvas ref={chartRef} width="800" height="400" />
-            </Box>
-            <Typography variant="h6" gutterBottom>
-              Pronóstico semanal
-            </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
-              {forecast.daily.time.map((day, index) => (
-                <Card key={day} sx={{ p: 2 }}>
-                  <Typography variant="subtitle1">
-                    {new Date(day).toLocaleDateString([], { weekday: 'long' })}
-                  </Typography>
-                  <Typography>
-                    Máx: {forecast.daily.temperature_2m_max[index]}°C
-                  </Typography>
-                  <Typography>
-                    Mín: {forecast.daily.temperature_2m_min[index]}°C
-                  </Typography>
-                </Card>
-              ))}
-            </Box>
+        {loading && !error && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress size={60} thickness={4} />
           </Box>
-        </Box>
-      )}
-    </Box>
+        )}
+        
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
+        {cityInfo && forecast && (
+          <Grid container spacing={3}>
+            {/* Clima actual */}
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar
+                      src={`https://flagcdn.com/w40/${cityInfo.countryCode?.toLowerCase()}.png`}
+                      alt={cityInfo.country}
+                      sx={{ mr: 2 }}
+                    />
+                    <Box>
+                      <Typography variant="h5">
+                        {cityInfo.name}, {cityInfo.country}
+                      </Typography>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {cityInfo.region}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    {getWeatherIcon(forecast.current_weather.weathercode)}
+                    <Typography variant="h2">
+                      {forecast.current_weather.temperature}°C
+                    </Typography>
+                  </Box>
+                  <Typography>
+                    <strong>Viento:</strong> {forecast.current_weather.windspeed} km/h
+                  </Typography>
+                  <Typography>
+                    <strong>Hora:</strong> {new Date(forecast.current_weather.time).toLocaleTimeString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Gráfico y pronóstico */}
+            <Grid item xs={12} md={8}>
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="h6" gutterBottom>
+                  Pronóstico de temperatura
+                </Typography>
+                <canvas ref={chartRef} width="100%" height="300" />
+              </Box>
+              
+              <Typography variant="h6" gutterBottom>
+                Pronóstico diario ({startDate.toLocaleDateString()} - {endDate.toLocaleDateString()})
+              </Typography>
+              <Grid container spacing={2}>
+                {forecast.daily.time.map((day, index) => {
+                  const dayDate = new Date(day);
+                  if (dayDate >= startDate && dayDate <= endDate) {
+                    return (
+                      <Grid item xs={6} sm={4} md={3} key={day}>
+                        <Card sx={{ p: 2 }}>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            {dayDate.toLocaleDateString([], { weekday: 'short' })}
+                          </Typography>
+                          <Typography variant="body2">
+                            {dayDate.toLocaleDateString()}
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                            {getWeatherIcon(forecast.daily.weathercode[index])}
+                            <Box sx={{ ml: 1 }}>
+                              <Typography variant="body2">
+                                ↑ {forecast.daily.temperature_2m_max[index]}°C
+                              </Typography>
+                              <Typography variant="body2">
+                                ↓ {forecast.daily.temperature_2m_min[index]}°C
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Card>
+                      </Grid>
+                    );
+                  }
+                  return null;
+                })}
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+      </Box>
+    </LocalizationProvider>
   );
 };
 

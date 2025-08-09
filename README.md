@@ -1,12 +1,47 @@
-# React + Vite
+# Aplicación de Búsqueda de Ciudades y Clima
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Descripción
+Esta es una aplicación web que permite buscar ciudades de todo el mundo y obtener información meteorológica en tiempo real.  
+Utiliza la API **GeoDB Cities** para localizar ciudades y la API **Open-Meteo** para mostrar datos del clima actual y pronósticos horarios.
 
-Currently, two official plugins are available:
+## Características
+- Búsqueda controlada de ciudades (botón o tecla Enter)
+- Visualización de banderas de países junto a cada ciudad
+- Información climática detallada:
+  - Temperatura actual
+  - Condiciones meteorológicas
+  - Velocidad del viento
+- Página **WeatherCharts** con:
+  - Panel lateral con el clima actual
+  - Gráfico del pronóstico horario
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tecnologías Utilizadas
+- [React (Vite)](https://vitejs.dev/)
+- [Material UI (MUI)](https://mui.com/)
+- [React Router](https://reactrouter.com/)
+- [GeoDB Cities API](https://rapidapi.com/wirefreethought/api/geodb-cities/)
+- [Open-Meteo API](https://open-meteo.com/)
+- [Chart.js](https://www.chartjs.org/)
+- [date-fns](https://date-fns.org/)
 
-## Expanding the ESLint configuration
+## Instalación y Ejecución
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Clona este repositorio:
+   ```bash
+   git clone <URL-del-repositorio>
+   cd mi-proyecto
+   ```
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+3. Ejecuta la aplicación en modo desarrollo:
+   ```bash
+   npm run dev
+   ```
+
+
+
+
+
+
