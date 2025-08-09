@@ -4,6 +4,7 @@ import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
 import NotFound from "./pages/NotFound/NotFound";
+import WeatherCharts from "./pages/WeatherCharts/WeatherCharts";
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
       <Route index element={<Home/>} />
       <Route path="about" element={<About/>} />
       <Route path="contact" element={<Contact/>} />
+      <Route path="weather-charts/:cityId" element={<WeatherCharts />} />
       <Route path="*" element={<NotFound/>} />
 
       </Route>

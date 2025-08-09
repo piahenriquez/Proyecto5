@@ -16,7 +16,7 @@ import { Box, Container, Typography, Link } from "@mui/material";
     >
       <Container maxWidth="sm">
         <Typography variant="body1" align="center">
-          © {new Date().getFullYear()} Citfind. Todos los derechos reservados.
+          © {new Date().getFullYear()} Cityfind. Todos los derechos reservados.
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center">
           <Link color="inherit" href="/">

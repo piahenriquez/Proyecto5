@@ -11,14 +11,13 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { Link } from 'react-router-dom';
+import logo from '../../assets/Img/logo.png'; 
 
 const pages = [
   { name: 'Inicio', path: '/' },
   { name: 'Acerca', path: '/about' },
   { name: 'Contact', path: '/contact' },
-  { name: 'Hooks', path: '/hooks' },
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -45,12 +44,23 @@ function Header() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          {/* Logo para pantallas grandes */}
+          <Box 
+            component="img"
+            src={logo}
+            alt="Logo"
+            sx={{ 
+              height: 40,
+              display: { xs: 'none', md: 'flex' },
+              mr: 1
+            }}
+          />
+          
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+            component={Link}
+            to="/"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -61,9 +71,10 @@ function Header() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            {}
           </Typography>
 
+          {/*celular menu */}
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -92,21 +103,35 @@ function Header() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page.name} 
-                component={Link}
-                to={page.path}
-                onClick={handleCloseNavMenu}>
+                <MenuItem 
+                  key={page.name} 
+                  component={Link}
+                  to={page.path}
+                  onClick={handleCloseNavMenu}
+                >
                   <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          
+          {/* Logo para celular */}
+          <Box 
+            component="img"
+            src={logo}
+            alt="Logo"
+            sx={{ 
+              height: 30,
+              display: { xs: 'flex', md: 'none' },
+              mr: 1
+            }}
+          />
+          
           <Typography
             variant="h5"
             noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+            component={Link}
+            to="/"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -118,8 +143,10 @@ function Header() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            {}
           </Typography>
+
+          {/* Menú para pantallas grandes */}
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
@@ -133,10 +160,12 @@ function Header() {
               </Button>
             ))}
           </Box>
+
+          {/* Menú de usuario */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -167,4 +196,5 @@ function Header() {
     </AppBar>
   );
 }
+
 export default Header;
