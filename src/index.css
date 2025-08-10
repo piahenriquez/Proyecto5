@@ -11,3 +11,26 @@ body, html, #root {
 main {
   flex: 1; 
 }
+.error-boundary {
+  padding: 20px;
+  background: #ffecec;
+  border: 1px solid #ff6b6b;
+  border-radius: 8px;
+  text-align: center;
+  margin: 20px auto;
+  max-width: 500px;
+}
+
+.error-boundary h2 {
+  color: #ff6b6b;
+}
+
+.error-boundary button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}

@@ -17,7 +17,7 @@ import logo from '../../assets/Img/logo.png';
 const pages = [
   { name: 'Inicio', path: '/' },
   { name: 'Acerca', path: '/about' },
-  { name: 'Contact', path: '/contact' },
+  { name: 'Contacto', path: '/contact' },
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom"
 import Header from "./Header"
 import Footer from "./Footer"
 import { Box } from '@mui/material'
+import { ErrorBoundary } from "../ErrorBoundary"
 
 const Layout = () => {
     return (
@@ -19,11 +20,11 @@ const Layout = () => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    py: 4,
-                    px: 2
                 }}
             >
+                <ErrorBoundary>
                 <Outlet/>
+                </ErrorBoundary>
             </Box>
             
             <Footer/>

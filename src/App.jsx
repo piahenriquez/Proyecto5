@@ -6,10 +6,12 @@ import Contact from "./pages/Contact/Contact";
 import NotFound from "./pages/NotFound/NotFound";
 import WeatherCharts from "./pages/WeatherCharts/WeatherCharts";
 
+
+
 function App() {
 
   return (
-    <BrowserRouter>
+    <BrowserRouter>    
     <Routes>
       <Route path="/" element={<Layout/>} >
       <Route index element={<Home/>} />
@@ -19,8 +21,7 @@ function App() {
       <Route path="*" element={<NotFound/>} />
 
       </Route>
-
-      </Routes>
+      </Routes>      
     </BrowserRouter>
   )
 }
