@@ -5,6 +5,7 @@ import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
 import NotFound from "./pages/NotFound/NotFound";
 import WeatherCharts from "./pages/WeatherCharts/WeatherCharts";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 
 
@@ -19,6 +20,7 @@ function App() {
       <Route path="contact" element={<Contact/>} />
       <Route path="weather-charts/:cityId" element={<WeatherCharts />} />
       <Route path="*" element={<NotFound/>} />
+      <Route path="dashboard" element={<Dashboard />} />
 
       </Route>
       </Routes>      

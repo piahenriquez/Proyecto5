@@ -1,6 +1,7 @@
-import { Box, Container, Typography, Link } from "@mui/material";
+import { Box, Container, Typography, Link as MuiLink } from "@mui/material";
+import { Link } from "react-router-dom"; // 👈 Importa Link de React Router
 
- function Footer() {
+function Footer() {
   return (
     <Box
       component="footer"
@@ -19,20 +20,21 @@ import { Box, Container, Typography, Link } from "@mui/material";
           © {new Date().getFullYear()} Cityfind. Todos los derechos reservados.
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center">
-          <Link color="inherit" href="/">
+          <MuiLink component={Link} to="/" color="inherit"> 
             Inicio
-          </Link>{" "}
+          </MuiLink>{" "}
           |{" "}
-          <Link color="inherit" href="/about">
+          <MuiLink component={Link} to="/about" color="inherit">
             Acerca de
-          </Link>{" "}
+          </MuiLink>{" "}
           |{" "}
-          <Link color="inherit" href="/contact">
+          <MuiLink component={Link} to="/contact" color="inherit">
             Contacto
-          </Link>
+          </MuiLink>
         </Typography>
       </Container>
     </Box>
   );
 }
+
 export default Footer;
