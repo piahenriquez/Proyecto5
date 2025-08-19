@@ -21,7 +21,7 @@ const CitySearch = () => {
   const navigate = useNavigate();
 
   // API Key
-  const GEO_API_KEY = "7d392d73a8mshd529ad7b1b590b9p1e5f6ajsn23880764888e";
+  const GEO_API_KEY = import.meta.env.VITE_GEO_API_KEY;
 
   useEffect(() => {
     if (inputRef.current) {

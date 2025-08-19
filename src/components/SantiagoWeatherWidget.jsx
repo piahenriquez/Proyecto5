@@ -5,6 +5,8 @@ import CloudIcon from "@mui/icons-material/Cloud";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import AirIcon from "@mui/icons-material/Air";
 
+const OPEN_METEO_URL = import.meta.env.VITE_OPEN_METEO_URL;
+
 export default function SantiagoWeatherWidget() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,7 +17,7 @@ export default function SantiagoWeatherWidget() {
       try {
         
         const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=-33.45&longitude=-70.66&current=temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America/Santiago`
+          `${OPEN_METEO_URL}?latitude=-33.45&longitude=-70.66&current=temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America/Santiago`
         );
         if (!response.ok) throw new Error("Error al cargar datos");
         const data = await response.json();

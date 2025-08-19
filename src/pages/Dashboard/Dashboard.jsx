@@ -6,6 +6,9 @@ export default function Dashboard() {
   return (
     <Box sx={{
        p: 3,
+        flex: 1,
+       display: "flex",
+        flexDirection: "column",
        justifyContent: "center",
        }}>
       <Grid container 

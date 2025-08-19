@@ -13,6 +13,9 @@ import esLocale from 'date-fns/locale/es';
 
 Chart.register(...registerables);
 
+const GEO_API_KEY = import.meta.env.VITE_GEO_API_KEY;
+const OPEN_METEO_URL = import.meta.env.VITE_OPEN_METEO_URL;
+
 const WeatherCharts = () => {
   const { cityId } = useParams();
   const navigate = useNavigate();
@@ -44,7 +47,7 @@ const WeatherCharts = () => {
           `https://wft-geo-db.p.rapidapi.com/v1/geo/cities/${cityId}`,
           {
             headers: {
-              "X-RapidAPI-Key": "7d392d73a8mshd529ad7b1b590b9p1e5f6ajsn23880764888e",
+              "X-RapidAPI-Key": import.meta.env.VITE_GEO_API_KEY,
               "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com"
             }
           }
@@ -66,7 +69,7 @@ const WeatherCharts = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&start_date=${formatDate(startDate)}&end_date=${formatDate(endDate)}&timezone=auto`
+          `${OPEN_METEO_URL}?latitude=${city.latitude}&longitude=${city.longitude}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&start_date=${formatDate(startDate)}&end_date=${formatDate(endDate)}&timezone=auto`
         );
         if (!response.ok) throw new Error("Error al obtener datos del clima");
         const data = await response.json();

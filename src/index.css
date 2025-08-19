@@ -20,7 +20,11 @@ main {
   margin: 20px auto;
   max-width: 500px;
 }
-
+body {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
 .error-boundary h2 {
   color: #ff6b6b;
 }

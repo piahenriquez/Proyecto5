@@ -14,6 +14,8 @@ const DEFAULT_CITIES = [
   { name: "Ciudad de México", population: 21.9 },
 ];
 
+const GEO_API_KEY = import.meta.env.VITE_GEO_API_KEY;
+
 export default function PopularCitiesChart() {
   const [cities, setCities] = useState([]); 
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function PopularCitiesChart() {
           "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&sort=-population",
           {
             headers: {
-              "X-RapidAPI-Key": "7d392d73a8mshd529ad7b1b590b9p1e5f6ajsn23880764888e",
+              "X-RapidAPI-Key": GEO_API_KEY,
               "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
             },
           }

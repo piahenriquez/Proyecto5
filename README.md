@@ -39,6 +39,11 @@ Utiliza la API **GeoDB Cities** para localizar ciudades y la API **Open-Meteo** 
    ```bash
    npm run dev
    ```
+   # Configuración de API Keys
+
+1. Regístrese en RapidAPI: https://rapidapi.com/
+2. Suscríbase a la API "GB Cities"
+3. Cree un archivo `.env` en la raíz del proyecto
 
 
 
